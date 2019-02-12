@@ -16,10 +16,15 @@ class Metrics(val registry: CollectorRegistry) {
 
     fun prometheus(function: () -> Evaluering): Evaluering {
         val evaluering: Evaluering = function()
-        counter
-                .labels(evaluering.identifikator, evaluering.resultat.name)
-                .inc()
+        evaluering.tell()
         return evaluering
+    }
+
+    private fun Evaluering.tell() {
+        counter
+                .labels(this.identifikator, this.resultat.name)
+                .inc()
+        this.children.forEach { it.tell() }
     }
 }
 

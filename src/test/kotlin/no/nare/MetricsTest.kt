@@ -21,9 +21,7 @@ class MetricsTest {
 
         assertThat(e.resultat).isEqualTo(Resultat.JA)
 
-        val sampleValue: Double = registry.getSampleValue("nare_result",
-                arrayOf(metrics.idLabel, metrics.evaluationLabel),
-                arrayOf(høyereEnnTi.identitet, Resultat.JA.name))
+        val sampleValue: Double = _sample(registry, høyereEnnTi.identitet, Resultat.JA.name)
 
         assertThat(sampleValue).isEqualTo(1.0)
     }
@@ -33,6 +31,29 @@ class MetricsTest {
         val metrics = Metrics(registry)
         val e = metrics.prometheus { høyereEnnTi.evaluer(12) }
         val f = metrics.prometheus { høyereEnnTi.evaluer(8) }
+    }
+
+    @Test
+    fun `alle noder i en evaluering skal telles`() {
+        val metrics = Metrics(registry)
+        val e = metrics.prometheus { partallOverTi.evaluer(11) }
+
+        assertThat(e.resultat).isEqualTo(Resultat.NEI)
+
+        val partallOverTiEvaluering: Double = _sample(registry, partallOverTi.identitet, Resultat.NEI.name)
+        assertThat(partallOverTiEvaluering).isEqualTo(1.0)
+
+        val partallEvaluering: Double = _sample(registry, partall.identitet, Resultat.NEI.name)
+        assertThat(partallEvaluering).isEqualTo(1.0)
+
+        val høyereEnnTiEvaluering: Double = _sample(registry, høyereEnnTi.identitet, Resultat.JA.name)
+        assertThat(høyereEnnTiEvaluering).isEqualTo(1.0)
+    }
+
+    fun _sample(registry: CollectorRegistry, id: String, resultat: String): Double {
+        return registry.getSampleValue("nare_result",
+                arrayOf("identifikator", "evaluation"),
+                arrayOf(id, resultat))
     }
 
 }
