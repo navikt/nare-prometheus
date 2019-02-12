@@ -1,7 +1,7 @@
 package no.nare
 
 import io.prometheus.client.CollectorRegistry
-import no.nav.Metrics
+import no.nav.NarePrometheus
 import no.nav.nare.core.evaluations.Evaluering.Companion.ja
 import no.nav.nare.core.evaluations.Evaluering.Companion.kanskje
 import no.nav.nare.core.evaluations.Evaluering.Companion.nei
@@ -10,14 +10,14 @@ import no.nav.nare.core.specifications.Spesifikasjon
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class MetricsTest {
+class NarePrometheusTest {
 
     val registry: CollectorRegistry = CollectorRegistry()
 
     @Test
     fun `en evaluering skal kunne rapportere sine resultat`() {
-        val metrics = Metrics(registry)
-        val e = metrics.prometheus { høyereEnnTi.evaluer(12) }
+        val narePrometheus = NarePrometheus(registry)
+        val e = narePrometheus.tellEvaluering { høyereEnnTi.evaluer(12) }
 
         assertThat(e.resultat).isEqualTo(Resultat.JA)
 
@@ -28,15 +28,15 @@ class MetricsTest {
 
     @Test
     fun `det skal være mulig å rapportere resultater flere ganger`() {
-        val metrics = Metrics(registry)
-        val e = metrics.prometheus { høyereEnnTi.evaluer(12) }
-        val f = metrics.prometheus { høyereEnnTi.evaluer(8) }
+        val narePrometheus = NarePrometheus(registry)
+        val e = narePrometheus.tellEvaluering { høyereEnnTi.evaluer(12) }
+        val f = narePrometheus.tellEvaluering { høyereEnnTi.evaluer(8) }
     }
 
     @Test
     fun `alle noder i en evaluering skal telles`() {
-        val metrics = Metrics(registry)
-        val e = metrics.prometheus { partallOverTi.evaluer(11) }
+        val narePrometheus = NarePrometheus(registry)
+        val e = narePrometheus.tellEvaluering { partallOverTi.evaluer(11) }
 
         assertThat(e.resultat).isEqualTo(Resultat.NEI)
 
@@ -52,9 +52,9 @@ class MetricsTest {
 
     @Test
     fun `sample-value skal øke når samme node evalueres til det samme flere ganger`() {
-        val metrics = Metrics(registry)
-        metrics.prometheus { partallOverTi.evaluer(12) }
-        metrics.prometheus { partallOverTi.evaluer(8) }
+        val narePrometheus = NarePrometheus(registry)
+        narePrometheus.tellEvaluering { partallOverTi.evaluer(12) }
+        narePrometheus.tellEvaluering { partallOverTi.evaluer(8) }
         val partallEvaluering: Double = _sample(registry, partall.identitet, Resultat.JA.name)
         assertThat(partallEvaluering).isEqualTo(2.0)
     }
