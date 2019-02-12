@@ -200,9 +200,9 @@
    </distributionManagement>
 
    <scm>
-      <developerConnection>scm:git:git@github.com:navikt/nare.git</developerConnection>
-      <connection>scm:git:git@github.com:navikt/nare.git</connection>
-      <url>https://github.com/navikt/nare</url>
+      <developerConnection>scm:git:git@github.com:navikt/nare-prometheus.git</developerConnection>
+      <connection>scm:git:git@github.com:navikt/nare-prometheus.git</connection>
+      <url>https://github.com/navikt/nare-prometheus</url>
       <tag>HEAD</tag>
    </scm>
 
