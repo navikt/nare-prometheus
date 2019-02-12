@@ -1,14 +1,12 @@
 package no.nare
 
 import io.prometheus.client.CollectorRegistry
-import no.nav.evaluationLabel
-import no.nav.idLabel
+import no.nav.Metrics
 import no.nav.nare.core.evaluations.Evaluering.Companion.ja
 import no.nav.nare.core.evaluations.Evaluering.Companion.kanskje
 import no.nav.nare.core.evaluations.Evaluering.Companion.nei
 import no.nav.nare.core.evaluations.Resultat
 import no.nav.nare.core.specifications.Spesifikasjon
-import no.nav.prometheus
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -18,15 +16,23 @@ class MetricsTest {
 
     @Test
     fun `en evaluering skal kunne rapportere sine resultat`() {
-        val e = prometheus(registry) { høyereEnnTi.evaluer(12) }
+        val metrics = Metrics(registry)
+        val e = metrics.prometheus { høyereEnnTi.evaluer(12) }
 
         assertThat(e.resultat).isEqualTo(Resultat.JA)
 
         val sampleValue: Double = registry.getSampleValue("nare_result",
-                arrayOf(idLabel, evaluationLabel),
+                arrayOf(metrics.idLabel, metrics.evaluationLabel),
                 arrayOf(høyereEnnTi.identitet, Resultat.JA.name))
 
         assertThat(sampleValue).isEqualTo(1.0)
+    }
+
+    @Test
+    fun `det skal være mulig å rapportere resultater flere ganger`() {
+        val metrics = Metrics(registry)
+        val e = metrics.prometheus { høyereEnnTi.evaluer(12) }
+        val f = metrics.prometheus { høyereEnnTi.evaluer(8) }
     }
 
 }
