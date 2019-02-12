@@ -5,6 +5,7 @@ jdk:
 before_install:
 - openssl aes-256-cbc -K $encrypted_1ee86b879c1f_key -iv $encrypted_1ee86b879c1f_iv
   -in travis/codesigning.asc.enc -out travis/codesigning.asc -d
+- export COMMIT_SHORT=$(git rev-parse --short HEAD)
 script:
 - mvn clean install
 - |
@@ -13,6 +14,7 @@ script:
      echo "Importing GPG key into keyring"
      gpg --fast-import travis/codesigning.asc
      mvn versions:set -DnewVersion="$COMMIT_SHORT"
+     mvn versions:commit
 
      echo "Running release"
      mvn --settings travis/settings.xml deploy -Prelease -DskipTests=true
