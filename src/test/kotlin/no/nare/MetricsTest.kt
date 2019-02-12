@@ -50,6 +50,15 @@ class MetricsTest {
         assertThat(høyereEnnTiEvaluering).isEqualTo(1.0)
     }
 
+    @Test
+    fun `sample-value skal øke når samme node evalueres til det samme flere ganger`() {
+        val metrics = Metrics(registry)
+        metrics.prometheus { partallOverTi.evaluer(12) }
+        metrics.prometheus { partallOverTi.evaluer(8) }
+        val partallEvaluering: Double = _sample(registry, partall.identitet, Resultat.JA.name)
+        assertThat(partallEvaluering).isEqualTo(2.0)
+    }
+
     fun _sample(registry: CollectorRegistry, id: String, resultat: String): Double {
         return registry.getSampleValue("nare_result",
                 arrayOf("identifikator", "evaluation"),
