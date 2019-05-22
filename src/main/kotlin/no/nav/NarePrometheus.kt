@@ -20,9 +20,12 @@ class NarePrometheus(registry: CollectorRegistry) {
     }
 
     private fun Evaluering.tell() {
-        telleverk
+        when {
+            identifikator.isNotBlank() -> telleverk
                 .labels(this.identifikator, this.resultat.name)
                 .inc()
+        }
+
         this.children.forEach { it.tell() }
     }
 }

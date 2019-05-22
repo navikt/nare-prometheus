@@ -21,7 +21,7 @@ class NarePrometheusTest {
 
         assertThat(e.resultat).isEqualTo(Resultat.JA)
 
-        val sampleValue: Double = _sample(registry, høyereEnnTi.identitet, Resultat.JA.name)
+        val sampleValue: Double = _sample(registry, høyereEnnTi.identifikator, Resultat.JA.name)
 
         assertThat(sampleValue).isEqualTo(1.0)
     }
@@ -34,19 +34,16 @@ class NarePrometheusTest {
     }
 
     @Test
-    fun `alle noder i en evaluering skal telles`() {
+    fun `alle noder med identifikatorer satt i en evaluering skal telles`() {
         val narePrometheus = NarePrometheus(registry)
         val e = narePrometheus.tellEvaluering { partallOverTi.evaluer(11) }
 
         assertThat(e.resultat).isEqualTo(Resultat.NEI)
 
-        val partallOverTiEvaluering: Double = _sample(registry, partallOverTi.identitet, Resultat.NEI.name)
-        assertThat(partallOverTiEvaluering).isEqualTo(1.0)
-
-        val partallEvaluering: Double = _sample(registry, partall.identitet, Resultat.NEI.name)
+        val partallEvaluering: Double = _sample(registry, partall.identifikator, Resultat.NEI.name)
         assertThat(partallEvaluering).isEqualTo(1.0)
 
-        val høyereEnnTiEvaluering: Double = _sample(registry, høyereEnnTi.identitet, Resultat.JA.name)
+        val høyereEnnTiEvaluering: Double = _sample(registry, høyereEnnTi.identifikator, Resultat.JA.name)
         assertThat(høyereEnnTiEvaluering).isEqualTo(1.0)
     }
 
@@ -55,7 +52,7 @@ class NarePrometheusTest {
         val narePrometheus = NarePrometheus(registry)
         narePrometheus.tellEvaluering { partallOverTi.evaluer(12) }
         narePrometheus.tellEvaluering { partallOverTi.evaluer(8) }
-        val partallEvaluering: Double = _sample(registry, partall.identitet, Resultat.JA.name)
+        val partallEvaluering: Double = _sample(registry, partall.identifikator, Resultat.JA.name)
         assertThat(partallEvaluering).isEqualTo(2.0)
     }
 
@@ -69,21 +66,21 @@ class NarePrometheusTest {
 
 val høyereEnnTi = Spesifikasjon<Int>(
         beskrivelse = "Er tallet høyere enn 10?",
-        identitet = "§§ 8-30 8-29"
-) { tall ->
+        identifikator = "§§ 8-30 8-29"
+) {
     when {
-        tall > 10 -> ja("tallet er høyere enn 10")
-        tall < 10 -> nei("tallet er lavere enn 10")
+        this > 10 -> ja("tallet er høyere enn 10")
+        this < 10 -> nei("tallet er lavere enn 10")
         else -> kanskje("logikken her tar ikke høyde for likhet")
     }
 }
 val partall = Spesifikasjon<Int>(
         beskrivelse = "Er tallet et partall?",
-        identitet = "§ 8-2 første ledd"
-) { tall ->
+        identifikator = "§ 8-2 første ledd"
+) {
     when {
-        tall % 2 == 0 -> ja("Tallet er et partall")
-        tall < 0 -> kanskje("logikken tar ikke høyde for negative tall")
+        this % 2 == 0 -> ja("Tallet er et partall")
+        this < 0 -> kanskje("logikken tar ikke høyde for negative tall")
         else -> nei("Tallet er et oddetall")
     }
 }
